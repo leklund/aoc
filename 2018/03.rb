@@ -4,20 +4,33 @@ def parse_line(line)
 end
 
 def run(input)
-  points = Hash.new { |hash, key| hash[key] = 0 }
-  input.split("\n").each do |line|
-    _id, x, y, width, height = parse_line(line)
+  points = Hash.new { |h, k| h[k] = [] }
+  overlaps = {}
+  ids = []
 
+  input.split("\n").each do |line|
+    id, x, y, width, height = parse_line(line)
+
+    ids << id
     width.times do |w|
       coordx = x + w
       height.times do |h|
         coordy = y + h
-        points["#{coordx}x#{coordy}"] += 1
+
+        points["#{coordx}x#{coordy}"] << id
+
+        next if points["#{coordx}x#{coordy}"].size <= 1
+
+        points["#{coordx}x#{coordy}"].each do |oid|
+          overlaps[oid] = true
+        end
       end
     end
   end
 
-  points.values.select{ |v| v > 1 }.size
+  overlapping_area = points.values.select{ |v| v.size > 1 }.size
+  no_overlap = (ids - overlaps.keys).first
+  [overlapping_area, no_overlap]
 end
 
 def run_tests
@@ -26,16 +39,20 @@ def run_tests
 #2 @ 3,1: 4x4
 #3 @ 5,5: 2x2
   INPUT
-  expected = 4
-  actual = run(input)
-  abort "failure: expected #{actual} to eq #{expected}" unless actual == expected
+  expected_one = 4
+  expected_two = 3
+  actual_one, actual_two = run(input)
+  abort "failure: expected #{actual_one} to eq #{expected_one}" unless actual_one == expected_one
+  abort "failure: expected #{actual_two} to eq #{expected_two}" unless actual_two == expected_two
 end
 
 data = DATA.read
 
 run_tests
 
-puts run(data)
+part_one, part_two = run(data)
+puts "part one: #{part_one}"
+puts "part two: #{part_two}"
 
 # ID @ Starting Coordinate: Size (width x height)
 __END__
