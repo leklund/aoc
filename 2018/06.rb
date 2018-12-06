@@ -57,9 +57,18 @@ class Graph
   def bounded
     points.select { |_k, v| v.unbounded == false }
   end
+
+  def distance_to_all_points(x:, y:, max_dist:)
+    points.map { |_x, point|
+      dist = point.dist(x, y)
+      return max_dist if dist >= max_dist
+
+      dist
+    }.compact.sum
+  end
 end
 
-def run(input)
+def run_part_one(input)
   graph = Graph.new
   input.each do |p|
     x, y = p.split(', ')
@@ -89,7 +98,31 @@ def run(input)
   point.area + 1
 end
 
-def test
+def run_part_two(input, distance)
+  graph = Graph.new
+  input.each do |p|
+    x, y = p.split(', ')
+    graph.add(Point.new(x: Integer(x), y: Integer(y)))
+  end
+
+  graph.set_bounds
+
+  num_points = graph.points.size
+  area = 0
+
+  # Brute force every point inside the corners of the graph.
+  # Depending on the input distance this is not guaranteed to return
+  # the correct answer.
+  (graph.xmin..graph.xmax).each do |x|
+    (graph.ymin..graph.ymax).each do |y|
+      area += 1 if graph.distance_to_all_points(x: x, y: y, max_dist: distance) < distance
+    end
+  end
+
+  area
+end
+
+def test_part_one
   input = <<~INPUT
     1, 1
     1, 6
@@ -99,7 +132,7 @@ def test
     8, 9
   INPUT
 
-  actual = run(input.split("\n"))
+  actual = run_part_one(input.split("\n"))
   expected = 17
 
   abort "❌ expected #{actual} to eq #{expected}" unless actual == expected
@@ -107,12 +140,35 @@ def test
   puts "✅"
 end
 
-test
+def test_part_two
+  input = <<~INPUT
+    1, 1
+    1, 6
+    8, 3
+    3, 4
+    5, 5
+    8, 9
+  INPUT
+
+  actual = run_part_two(input.split("\n"), 32)
+  expected = 16
+
+  abort "❌ expected #{actual} to eq #{expected}" unless actual == expected
+
+  puts "✅"
+end
+
+test_part_one
 
 data = DATA.read.chomp
 
-out = run(data.split("\n"))
-puts "answer: #{out}"
+out = run_part_one(data.split("\n"))
+puts "part one: #{out}"
+
+test_part_two
+
+out = run_part_two(data.split("\n"), 10_000)
+puts "part two: #{out}"
 
 __END__
 315, 342
