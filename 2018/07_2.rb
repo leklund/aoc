@@ -97,9 +97,6 @@ def run(input)
       elf.working = true
     end
 
-    curr = workers.map { |w| w.current_step&.id || 0 }
-    puts "#{t}: #{curr.join(' ')}"
-
     # do work
     t += 1
     workers.select(&:working?).each do |elf|
