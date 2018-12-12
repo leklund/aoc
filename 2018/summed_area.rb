@@ -8,18 +8,16 @@ class Matrix
 
     sat = Matrix.zero(rows, cols).to_a
 
-    rows.times do |i|
-      cols.times do |j|
-        x = i > 0 ? i : 0
-        y = j > 0 ? j : 0
+    rows.times do |x|
+      cols.times do |y|
         a = self[x, y]
 
-        b = sat.fetch(i - 1, []).fetch(j, 0)
-        c = sat[i].fetch(j - 1, 0)
+        b = sat.fetch(x - 1, []).fetch(y, 0)
+        c = sat[x].fetch(y - 1, 0)
 
-        d = i.zero? || j.zero? ? 0 : sat[i - 1][j - 1]
+        d = x.zero? || y.zero? ? 0 : sat[x - 1][y - 1]
 
-        sat[i][j] = a + b + c - d
+        sat[x][y] = a + b + c - d
       end
     end
 
@@ -27,9 +25,11 @@ class Matrix
   end
 
   def summed_area(x0, y0, x1, y1)
-    sat = summed_area_table
     x0 = x0.zero? ? 0 : x0 - 1
     y0 = y0.zero? ? 0 : y0 - 1
-    sat[x1, y1] + sat[x0, y0] - sat[x1, y0] - sat[x0, y1]
+    summed_area_table[x1, y1] +
+      summed_area_table[x0, y0] -
+      summed_area_table[x1, y0] -
+      summed_area_table[x0, y1]
   end
 end
