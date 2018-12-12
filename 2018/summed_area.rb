@@ -12,10 +12,21 @@ class Matrix
       cols.times do |y|
         a = self[x, y]
 
-        b = sat.fetch(x - 1, []).fetch(y, 0)
-        c = sat[x].fetch(y - 1, 0)
+        if x.zero?
+          b = 0
+          d = 0
+        else
+          b = sat[x - 1][y]
+        end
 
-        d = x.zero? || y.zero? ? 0 : sat[x - 1][y - 1]
+        if y.zero?
+          c = 0
+          d = 0
+        else
+          c = sat[x][y - 1]
+        end
+
+        d ||= sat[x - 1][y - 1]
 
         sat[x][y] = a + b + c - d
       end
