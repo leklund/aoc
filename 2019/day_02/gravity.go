@@ -8,13 +8,8 @@ import (
 	"strings"
 )
 
-// HALT is opcode 99
-const HALT = 99
-
-// ADD opcode 1
+const HLT = 99
 const ADD = 1
-
-// MUL opcode is 2
 const MUL = 2
 
 func main() {
@@ -22,12 +17,28 @@ func main() {
 
 	prog := splitAndToI(line)
 
-	repair(prog)
-
-	run(prog)
+	// part one
+	testprog := setup(prog, 13, 2)
+	run(testprog)
 
 	fmt.Println("___PART ONE___")
-	fmt.Println("index 0: ", prog[0])
+	fmt.Println("index 0: ", testprog[0])
+
+	// part two
+	// brute force
+	for noun := 0; noun <= 99; noun++ {
+		for verb := 0; verb <= 99; verb++ {
+			testprog := setup(prog, noun, verb)
+
+			run(testprog)
+
+			if testprog[0] == 19690720 {
+				fmt.Println("___ PART TWO ___")
+				fmt.Print(100*noun + verb)
+			}
+		}
+	}
+
 }
 
 func run(program []int) {
@@ -36,25 +47,28 @@ func run(program []int) {
 			continue
 		}
 
-		if opcode == HALT {
-			return
-		}
-
 		p1, p2, op := program[idx+1], program[idx+2], program[idx+3]
 		v1, v2 := program[p1], program[p2]
 
-		if opcode == ADD {
+		switch opcode {
+		case HLT:
+			return
+		case ADD:
 			program[op] = v1 + v2
-		} else if opcode == MUL {
+		case MUL:
 			program[op] = v1 * v2
 		}
+
 	}
 }
 
-func repair(program []int) {
+func setup(program []int, noun int, verb int) []int {
 	// To do this, before running the program, replace position 1 with the value 12 and replace position 2 with the value 2.
-	program[1] = 12
-	program[2] = 2
+	newslice := make([]int, len(program))
+	copy(newslice, program)
+	newslice[1] = noun
+	newslice[2] = verb
+	return newslice
 }
 
 func getLine(path string) string {
