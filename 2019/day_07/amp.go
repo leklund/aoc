@@ -53,6 +53,7 @@ func main() {
 
 	signal := amp(prog)
 
+	fmt.Println("PART ONE:")
 	fmt.Println(signal)
 }
 
@@ -60,27 +61,32 @@ func amp(program []int) int {
 	p0 := []int{0, 1, 2, 3, 4}
 	phases := [][]int{}
 	generatePermutations(len(p0), p0, &phases)
+	fmt.Println("phases size:", len(phases))
+
+	ch := make(chan int)
 
 	signal := 0
 
-	for x, permutation := range phases {
-		i2 := 0
+	for z, permutation := range phases {
+		out := 0
 		for y, phase := range permutation {
-			fmt.Println(x, y)
-			i2 = run(program, phase, i2)[0]
+			fmt.Println(z, y)
+			go run(program, ch)
+			ch <- phase
+			ch <- out
+			out = <-ch
 		}
-		if i2 > signal {
-			signal = i2
+		if out > signal {
+			signal = out
 		}
 	}
 	return signal
 }
 
-func run(p []int, inputs ...int) []int {
+func run(p []int, ch chan int) {
 	program := make([]int, len(p))
 	copy(program, p)
 
-	var outputCodes []int
 	var pointer int
 
 	for {
@@ -101,22 +107,17 @@ func run(p []int, inputs ...int) []int {
 			params[i-1] = program[valuePointer]
 
 		}
-		// DEBUG
-		// fmt.Println(pointer, opcode, modes, params)
-
 		switch opcode {
 		case HLT:
-			return outputCodes
+			break
 		case ADD:
 			program[valuePointer] = params[0] + params[1]
 		case MUL:
 			program[valuePointer] = params[0] * params[1]
 		case INP:
-			input := inputs[0]
-			inputs = inputs[1:]
-			program[valuePointer] = input
+			program[valuePointer] = <-ch
 		case OUT:
-			outputCodes = append(outputCodes, program[valuePointer])
+			ch <- program[valuePointer]
 		case JIT:
 			if params[0] > 0 {
 				pointer = params[1]
