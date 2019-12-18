@@ -63,27 +63,27 @@ func amp(program []int) int {
 	generatePermutations(len(p0), p0, &phases)
 	fmt.Println("phases size:", len(phases))
 
-	ch := make(chan int)
+	in := make(chan int)
+	out := make(chan int)
 
 	signal := 0
 
-	for z, permutation := range phases {
-		out := 0
-		for y, phase := range permutation {
-			fmt.Println(z, y)
-			go run(program, ch)
-			ch <- phase
-			ch <- out
-			out = <-ch
+	for _, permutation := range phases {
+		output := 0
+		for _, phase := range permutation {
+			go run(program, in, out)
+			in <- phase
+			in <- output
+			output = <-out
 		}
-		if out > signal {
-			signal = out
+		if output > signal {
+			signal = output
 		}
 	}
 	return signal
 }
 
-func run(p []int, ch chan int) {
+func run(p []int, in, out chan int) {
 	program := make([]int, len(p))
 	copy(program, p)
 
@@ -115,9 +115,9 @@ func run(p []int, ch chan int) {
 		case MUL:
 			program[valuePointer] = params[0] * params[1]
 		case INP:
-			program[valuePointer] = <-ch
+			program[valuePointer] = <-in
 		case OUT:
-			ch <- program[valuePointer]
+			out <- program[valuePointer]
 		case JIT:
 			if params[0] > 0 {
 				pointer = params[1]
