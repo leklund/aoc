@@ -1,4 +1,4 @@
-package main
+package amp
 
 import (
 	"bufio"
@@ -63,10 +63,9 @@ func amp(program []int) int {
 
 	signal := 0
 
-	for x, permutation := range phases {
+	for _, permutation := range phases {
 		i2 := 0
-		for y, phase := range permutation {
-			fmt.Println(x, y)
+		for _, phase := range permutation {
 			i2 = run(program, phase, i2)[0]
 		}
 		if i2 > signal {
