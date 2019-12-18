@@ -1,4 +1,4 @@
-package amp
+package main
 
 import (
 	"bufio"
@@ -53,36 +53,45 @@ func main() {
 
 	signal := amp(prog)
 
+	fmt.Println("PART ONE:")
 	fmt.Println(signal)
 }
 
 func amp(program []int) int {
 	p0 := []int{0, 1, 2, 3, 4}
 	phases := [][]int{}
-	generatePermutations(len(p0), p0, &phases)
+	max := 0
+	in := make(chan int)
+	out := make(chan int)
 
-	signal := 0
+	generatePermutations(len(p0), p0, &phases)
+	fmt.Println("phases size:", len(phases))
 
 	for _, permutation := range phases {
-		i2 := 0
+
+		output := 0
 		for _, phase := range permutation {
-			i2 = run(program, phase, i2)[0]
+			p := make([]int, len(program))
+			copy(p, program)
+
+			go run(p, in, out)
+			in <- phase
+			in <- output
+			output = <-out
 		}
-		if i2 > signal {
-			signal = i2
+		if output > max {
+			max = output
 		}
+
 	}
-	return signal
+	return max
 }
 
-func run(p []int, inputs ...int) []int {
-	program := make([]int, len(p))
-	copy(program, p)
+func run(program []int, in, out chan int) {
 
-	var outputCodes []int
 	var pointer int
 
-	for {
+	for program[pointer] != HLT {
 		var params [3]int
 		var valuePointer int
 
@@ -100,22 +109,17 @@ func run(p []int, inputs ...int) []int {
 			params[i-1] = program[valuePointer]
 
 		}
-		// DEBUG
-		// fmt.Println(pointer, opcode, modes, params)
-
 		switch opcode {
 		case HLT:
-			return outputCodes
+			break
 		case ADD:
 			program[valuePointer] = params[0] + params[1]
 		case MUL:
 			program[valuePointer] = params[0] * params[1]
 		case INP:
-			input := inputs[0]
-			inputs = inputs[1:]
-			program[valuePointer] = input
+			program[valuePointer] = <-in
 		case OUT:
-			outputCodes = append(outputCodes, program[valuePointer])
+			out <- program[valuePointer]
 		case JIT:
 			if params[0] > 0 {
 				pointer = params[1]
