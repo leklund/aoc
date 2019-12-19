@@ -55,22 +55,26 @@ func main() {
 
 	fmt.Println("PART ONE:")
 	fmt.Println(signal)
+
+	signal2 := ampFeedback(prog)
+	fmt.Println("PART TWO:")
+	fmt.Println(signal2)
 }
 
 func amp(program []int) int {
 	p0 := []int{0, 1, 2, 3, 4}
-	phases := [][]int{}
+	permutations := [][]int{}
 	max := 0
 	in := make(chan int)
 	out := make(chan int)
 
-	generatePermutations(len(p0), p0, &phases)
-	fmt.Println("phases size:", len(phases))
+	generatePermutations(len(p0), p0, &permutations)
+	fmt.Println("phases size:", len(permutations))
 
-	for _, permutation := range phases {
+	for _, phases := range permutations {
 
 		output := 0
-		for _, phase := range permutation {
+		for _, phase := range phases {
 			p := make([]int, len(program))
 			copy(p, program)
 
@@ -84,6 +88,55 @@ func amp(program []int) int {
 		}
 
 	}
+	return max
+}
+
+func ampFeedback(program []int) int {
+	p0 := []int{5, 6, 7, 8, 9}
+	permutations := [][]int{}
+	max := 0
+
+	// one input and output channel per amplifier
+	// could likely be simplified to be one slice of chans
+	in := make([]chan int, 5)
+	out := make([]chan int, 5)
+
+	generatePermutations(len(p0), p0, &permutations)
+
+	for _, phases := range permutations {
+		for i, phase := range phases {
+			p := make([]int, len(program))
+			copy(p, program)
+
+			in[i] = make(chan int)
+			out[i] = make(chan int)
+
+			go run(program, in[i], out[i])
+
+			in[i] <- phase
+		}
+
+		output := 0
+		running := true
+
+		for running {
+			for i := range phases {
+				select {
+				case in[i] <- output:
+				default:
+					running = false
+				}
+				if !running {
+					break
+				}
+				output = <-out[i]
+			}
+		}
+		if output > max {
+			max = output
+		}
+	}
+
 	return max
 }
 
