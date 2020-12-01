@@ -33,3 +33,11 @@ func TestFindThree2020(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkFindThree2020(b *testing.B) {
+	file := "input.txt"
+	ints := readInts(file)
+	for n := 0; n < b.N; n++ {
+		FindThree2020(ints)
+	}
+}
