@@ -47,6 +47,7 @@ func ValidPasswordsTwo(lines string) []string {
 		i, j, char, pw := toI(string(m[1]))-1, toI(string(m[2]))-1, m[3][0], m[4]
 
 		// XOR
+		// can also be written as if (pw[i] == char) != (pw[j] == char) {}
 		if (pw[i] == char || pw[j] == char) && !(pw[i] == char && pw[j] == char) {
 			valid = append(valid, string(pw))
 		}
