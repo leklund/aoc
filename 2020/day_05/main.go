@@ -47,6 +47,8 @@ func main() {
 
 }
 
+// This was my first effort that I spent an hour debugging before having an AHA moment and realizing
+// That thery are just binary numbers.
 func makePass(p string) Pass {
 	fmt.Println(p)
 	f := 0
