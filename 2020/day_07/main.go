@@ -39,14 +39,6 @@ func bagCount(color string, tree map[string][]string, uniqs map[string]interface
 	return uniqs
 }
 
-// var input2 = `shiny gold bags contain 2 dark red bags.
-// dark red bags contain 2 dark orange bags.
-// dark orange bags contain 2 dark yellow bags.
-// dark yellow bags contain 2 dark green bags.
-// dark green bags contain 2 dark blue bags.
-// dark blue bags contain 2 dark violet bags.
-// dark violet bags contain no other bags.`
-
 func contentsBagCount(color string, tree map[string][]Contents) int {
 	count := 1
 	if children, ok := tree[color]; ok {
@@ -58,8 +50,6 @@ func contentsBagCount(color string, tree map[string][]Contents) int {
 }
 
 func parse(lines []string) (map[string][]string, map[string][]Contents) {
-	// light red bags contain 1 bright white bag, 2 muted yellow bags.
-	// faded blue bags contain no other bags.
 	var noBagsRe = regexp.MustCompile(`^(.*) bags contain no other bags\.$`)
 	var withBagsRe = regexp.MustCompile(`^(.*) bags contain (.+\.)$`)
 	var contentRe = regexp.MustCompile(`(\d+) (.+?) bags?`)
