@@ -42,41 +42,41 @@ var testCases2 = []struct {
 	},
 }
 
-// func TestOne(t *testing.T) {
-// 	for _, tc := range testCases {
-
-// 		count := countUniqs(tc.input)
-// 		if count != tc.count {
-// 			t.Errorf("Expected %d  got %d", tc.count, count)
-// 		}
-// 	}
-// }
-
-func TestDigitBilder(t *testing.T) {
-	base := map[string]string{
-		"acedgfb": "8",
-		"cdfbe":   "5",
-		"gcdfa":   "2",
-		"fbcad":   "3",
-		"dab":     "7",
-		"cefabd":  "9",
-		"cdfgeb":  "6",
-		"eafb":    "4",
-		"cagedb":  "0",
-		"ab":      "1",
-	}
-	dm := digitMap(base)
+func TestOne(t *testing.T) {
 	for _, tc := range testCases {
-		for i, entry := range tc.input {
-			digit := buildNumber(entry, dm)
 
-			if digit != tc.digits[i] {
-				t.Errorf("Exepcted %d got %d for entry %v", tc.digits[i], digit, entry)
-			}
+		count := countUniqs(tc.input)
+		if count != tc.count {
+			t.Errorf("Expected %d  got %d", tc.count, count)
 		}
-
 	}
 }
+
+// func TestDigitBilder(t *testing.T) {
+// 	base := map[string]string{
+// 		"acedgfb": "8",
+// 		"cdfbe":   "5",
+// 		"gcdfa":   "2",
+// 		"fbcad":   "3",
+// 		"dab":     "7",
+// 		"cefabd":  "9",
+// 		"cdfgeb":  "6",
+// 		"eafb":    "4",
+// 		"cagedb":  "0",
+// 		"ab":      "1",
+// 	}
+// 	dm := digitMap(base)
+// 	for _, tc := range testCases {
+// 		for i, entry := range tc.input {
+// 			digit := buildNumber(entry, dm)
+
+// 			if digit != tc.digits[i] {
+// 				t.Errorf("Exepcted %d got %d for entry %v", tc.digits[i], digit, entry)
+// 			}
+// 		}
+
+// 	}
+// }
 
 func TestDecoder(t *testing.T) {
 	for _, tc := range testCases2 {
