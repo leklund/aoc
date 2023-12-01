@@ -95,3 +95,11 @@ func reverse(a []byte) {
 		a[i], a[opp] = a[opp], a[i]
 	}
 }
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	} else {
+		return x
+	}
+}
