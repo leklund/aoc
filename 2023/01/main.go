@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"slices"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -29,37 +31,28 @@ func One(lines []string) int {
 
 func Two(lines []string) int {
 	var x int
-	dm := map[string]string{
-		"one":   "1",
-		"two":   "2",
-		"three": "3",
-		"four":  "4",
-		"five":  "5",
-		"six":   "6",
-		"seven": "7",
-		"eight": "8",
-		"nine":  "9",
-	}
+	digits := []string{`\d`, "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
 
-	first := regexp.MustCompile(`(one|two|three|four|five|six|seven|eight|nine|\d)`)
-	last := regexp.MustCompile(`.*(one|two|three|four|five|six|seven|eight|nine|\d)`)
+	base := `(` + strings.Join(digits, "|") + `)`
+	first := regexp.MustCompile(base)
+	last := regexp.MustCompile(`.*` + base)
 
 	for _, line := range lines {
 		ma := first.FindString(line)
 		mb := last.FindStringSubmatch(line)[1]
 
-		var a, b string
-		a, ok := dm[ma]
-		if !ok {
-			a = ma
+		a := slices.Index(digits, ma)
+		if a > 0 {
+			x += a * 10
+		} else {
+			x += toI(ma) * 10
 		}
-
-		b, ok = dm[mb]
-		if !ok {
-			b = mb
+		b := slices.Index(digits, mb)
+		if b > 0 {
+			x += b
+		} else {
+			x += toI(mb)
 		}
-
-		x += toI(a + b)
 	}
 	return x
 }
